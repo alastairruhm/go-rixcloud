@@ -16,8 +16,37 @@ type Profile struct {
 	UserID int `json:"userid,omitempty"`
 }
 
-// Service the service which user subscribe
-type Service struct {
+// ActivedService ...
+type ActivedService struct {
+	ServiceID    int    `json:"serviceid,omitempty"`
+	Name         string `json:"name,omitempty"`
+	GroupName    string `json:"groupname,omitempty"`
+	GroupID      int    `json:"groupid,omitempty"`
+	NextDueDate  string `json:"nextduedate,omitempty"`
+	BillingCycle string `json:"billingcycle,omitempty"`
+}
+
+// DeactivedServie ...
+type DeactivedServie struct {
+	ServiceID int    `json:"serviceid,omitempty"`
+	Status    string `json:"status,omitempty"`
+}
+
+// ServiceAPIResponse ...
+type ServiceAPIResponse struct {
+	Data ServiceOverview `json:"data,omitempty"`
+}
+
+// ServiceOverview ...
+type ServiceOverview struct {
+	ActiveCount  int               `json:"activecount,omitempty"`
+	TotalService int               `json:"totalserveice,omitempty"`
+	Actived      []ActivedService  `json:"actived,omitempty"`
+	Deactived    []DeactivedServie `json:"deactived,omitempty"`
+}
+
+// ServiceNode the node which service provide
+type ServiceNode struct {
 	Name      string `json:"name,omitempty"`
 	IP        string `json:"ip,omitempty"`
 	Provider  string `json:"provider,omitempty"`
@@ -42,4 +71,11 @@ func (s *ProfileService) VerifyCredentials() (*Profile, *http.Response, error) {
 	return profile, resp, firstError(err, apiError)
 }
 
-// func (s *ProfileService) ListServices() (*)
+// GetServiceOverview ...
+func (s *ProfileService) GetServiceOverview() (ServiceOverview, *http.Response, error) {
+	res := new(ServiceAPIResponse)
+	apiError := new(APIError)
+
+	resp, err := s.sling.New().Get("service/").Receive(res, apiError)
+	return res.Data, resp, firstError(err, apiError)
+}
