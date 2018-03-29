@@ -1,6 +1,7 @@
 package rixcloud
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/dghubble/sling"
@@ -34,7 +35,7 @@ type DeactivedServie struct {
 
 // ServiceAPIResponse ...
 type ServiceAPIResponse struct {
-	Data ServiceOverview `json:"data,omitempty"`
+	Data *ServiceOverview `json:"data,omitempty"`
 }
 
 // ServiceOverview ...
@@ -56,6 +57,18 @@ type ServiceNode struct {
 	Rate      string `json:"rate,omitempty"`
 }
 
+// TrafficAPIResponse ...
+type TrafficAPIResponse struct {
+	Data *Traffic `json:"data,omitempty"`
+}
+
+// Traffic data
+type Traffic struct {
+	Upload   string `json:"upload,omitempty"`
+	Download string `json:"download,omitempty"`
+	Total    string `json:"total,omitempty"`
+}
+
 // NewProfileService returns a new AccountService.
 func NewProfileService(sling *sling.Sling) *ProfileService {
 	return &ProfileService{
@@ -72,10 +85,20 @@ func (s *ProfileService) VerifyCredentials() (*Profile, *http.Response, error) {
 }
 
 // GetServiceOverview ...
-func (s *ProfileService) GetServiceOverview() (ServiceOverview, *http.Response, error) {
+func (s *ProfileService) GetServiceOverview() (*ServiceOverview, *http.Response, error) {
 	res := new(ServiceAPIResponse)
 	apiError := new(APIError)
 
 	resp, err := s.sling.New().Get("service/").Receive(res, apiError)
+	return res.Data, resp, firstError(err, apiError)
+}
+
+// GetTrafficData ...
+func (s *ProfileService) GetTrafficData(serviceid string) (*Traffic, *http.Response, error) {
+	url := fmt.Sprintf("service/%s/traffic", serviceid)
+	res := new(TrafficAPIResponse)
+	apiError := new(APIError)
+
+	resp, err := s.sling.New().Get(url).Receive(res, apiError)
 	return res.Data, resp, firstError(err, apiError)
 }
