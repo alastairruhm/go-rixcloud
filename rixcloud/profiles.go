@@ -64,9 +64,9 @@ type TrafficAPIResponse struct {
 
 // Traffic data
 type Traffic struct {
-	Upload   string `json:"upload,omitempty"`
-	Download string `json:"download,omitempty"`
-	Total    string `json:"total,omitempty"`
+	Upload   int64 `json:"upload,omitempty"`
+	Download int64 `json:"download,omitempty"`
+	Total    int64 `json:"total,omitempty"`
 }
 
 // NewProfileService returns a new AccountService.
